@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QR Code Generator & Scanner</title>
+  <link rel="icon" type="image/svg+xml" href="resources/qr-code-svgrepo-com.svg"/>
+
+  <!-- Tailwind and DaisyUI -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- QRCode.js -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+  <script>
+    function openScanner() {
+      window.location.href = "qr-scanner.html";
+    }
+
+    function generateQR() {
+      const link = document.getElementById("url").value.trim();
+      const qrWrapper = document.getElementById("qr-wrapper");
+      const qrBox = document.getElementById("qrcode-box");
+      const downloadBtn = document.getElementById("download-btn");
+
+      qrBox.innerHTML = ""; // Clear previous QR
+      downloadBtn.href = "#"; // Reset link
+      qrWrapper.classList.add("hidden");
+
+      if (!link) {
+        qrBox.innerHTML = "<span class='text-red-500'>Please enter a URL</span>";
+        return;
+      }
+
+      new QRCode(qrBox, {
+        text: link,
+        width: 250,
+        height: 250,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+
+      setTimeout(() => {
+        const canvas = qrBox.querySelector("canvas");
+        if (canvas) {
+          const imgData = canvas.toDataURL("image/png");
+          downloadBtn.href = imgData;
+          qrWrapper.classList.remove("hidden");
+        }
+      }, 5);
+    }
+  </script>
+</head>
+
+<body class="font-mono bg-base-100 flex flex-col items-center justify-center min-h-screen gap-8 p-4">
+
+  <!-- Toggle Button -->
+  <div class="absolute top-4 left-1/2 transform -translate-x-1/2 flex items-center gap-2">
+    <span class="font-bold">Generator</span>
+    <input type="checkbox" class="toggle toggle-xl bg-purple-400" onchange="openScanner()" />
+    <span class="font-bold">Scanner</span>
+  </div>
+
+  <!-- Input Section -->
+  <div class="flex items-center justify-center gap-4">
+    <input 
+      type="text" 
+      placeholder="URL here!" 
+      id="url"
+      class="input input-bordered bg-gray-100 placeholder:text-center font-semibold w-64" 
+    />
+    <button 
+      class="btn btn-primary bg-purple-400 p-4"
+      onclick="generateQR()"
+    >
+      <img src="resources/check-circle-svgrepo-com.svg" class="h-5 mr-0.5 bg-purple-400" />
+      Generate
+    </button>
+  </div>
+
+  <!-- QR Code Section -->
+  <div id="qr-wrapper" class="flex flex-col items-center gap-2 hidden">
+    <div id="qrcode-box" class="border bg-white border-gray-300 p-6 rounded-xl shadow-md min-h-[260px] min-w-[260px] flex items-center justify-center"></div>
+    <a id="download-btn" class="btn btn-outline w-15 bg-purple-400" download="qr-code.png">
+      <img src="resources/download-svgrepo-com.svg" class="h-[80%] bg-purple-400">
+    </a>
+  </div>
+
+</body>
+</html>

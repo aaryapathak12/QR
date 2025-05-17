@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QR Code Scanner</title>
+
+  <!-- Tailwind and DaisyUI -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+
+  <!-- Html5Qrcode Library -->
+  <script src="https://unpkg.com/html5-qrcode"></script>
+
+  <style>
+    body {
+      background-color: #D8B4FE;
+    }
+    .custom-color {
+      background-color: #69DCE1 !important;
+    }
+  </style>
+</head>
+<body class="font-mono flex flex-col items-center justify-center min-h-screen gap-8 p-4">
+
+  <!-- Toggle -->
+  <div class="absolute top-4 left-1/2 transform -translate-x-1/2 flex items-center gap-2">
+    <span class="font-bold">Generator</span>
+    <input 
+      type="checkbox" 
+      class="toggle toggle-xl custom-color" 
+      checked 
+      onchange="window.location.href='index.html'" 
+    />
+    <span class="font-bold">Scanner</span>
+  </div>
+
+  <!-- Scan Button -->
+  <button 
+    class="btn custom-color text-black font-bold"
+    onclick="startScanner()"
+  >
+    📷 Scan QR Code
+  </button>
+
+  <!-- Scanner Output -->
+  <div id="reader" class="hidden w-[300px] rounded-xl shadow-md overflow-hidden border border-black"></div>
+
+  <script>
+    let scannerStarted = false;
+
+    function startScanner() {
+      if (scannerStarted) return;
+      scannerStarted = true;
+
+      const reader = document.getElementById("reader");
+      reader.classList.remove("hidden");
+
+      const html5QrCode = new Html5Qrcode("reader");
+
+      html5QrCode.start(
+        { facingMode: "environment" },
+        {
+          fps: 10,
+          qrbox: 250
+        },
+        qrCodeMessage => {
+          html5QrCode.stop().then(() => {
+            scannerStarted = false;
+            window.open(qrCodeMessage, "_blank");
+          });
+        },
+        errorMessage => {
+          console.log("Scan failed: ", errorMessage);
+        }
+      ).catch(err => {
+        alert("Camera error: " + err);
+        scannerStarted = false;
+      });
+    }
+  </script>
+
+</body>
+</html>
